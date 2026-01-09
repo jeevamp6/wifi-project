@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Real-Time WiFi Monitor | Wi-Fi Hotspot Monitoring</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .monitor-dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+    
+    .map-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    #hotspotMap {
+      height: 600px;
+      width: 100%;
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .stats-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .connections-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 20px;
+    }
+    
+    .hotspot-list {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    
+    .hotspot-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      transition: all 0.3s ease;
+    }
+    
+    .hotspot-item:hover {
+      background: #f8f9fa;
+    }
+    
+    .hotspot-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    .status-online {
+      background: #28a745;
+      color: white;
+    }
+    
+    .status-offline {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .status-warning {
+      background: #ffc107;
+      color: #212529;
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .realtime-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #28a745;
+      border-radius: 50%;
+      margin-left: 10px;
+      animation: pulse 2s infinite;
+    }
+    
+    .header-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .connection-graph {
+      height: 250px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="monitor-dashboard">
+    <!-- Map Section -->
+    <div class="map-section">
+      <div class="header-info">
+        <h2>🗺️ Live Hotspot Map</h2>
+        <div>
+          <span>Real-time Status: </span>
+          <span class="realtime-indicator"></span>
+          <span id="connectionCount">0</span>
+          <span> active connections</span>
+        </div>
+      </div>
+      <div id="hotspotMap"></div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <div class="stats-card">
+        <h3>📊 Real-Time Statistics</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number" id="totalHotspots">0</div>
+            <div class="stat-label">Total Hotspots</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="activeHotspots">0</div>
+            <div class="stat-label">Active</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="totalConnections">0</div>
+            <div class="stat-label">Connections</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="avgUtilization">0%</div>
+            <div class="stat-label">Avg Utilization</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <h3>📈 Connection Trends</h3>
+        <div class="chart-container">
+          <canvas id="connectionChart" class="connection-graph"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connections Section -->
+    <div class="connections-section">
+      <h3>🔗 Active Connections</h3>
+      <div class="hotspot-list" id="hotspotList">
+        <!-- Hotspots will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="realtime-monitor.js"></script>
+</body>
+</html>

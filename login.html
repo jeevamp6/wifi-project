@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | Wi-Fi Hotspot Dashboard</title>
+  <link rel="stylesheet" href="login.css">
+  <style>
+    .login-container {
+      max-width: 400px;
+    }
+    .user-type {
+      margin-bottom: 20px;
+    }
+    .user-type label {
+      display: block;
+      margin-bottom: 10px;
+      color: #555;
+      font-weight: bold;
+    }
+    .user-type-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .user-type-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .user-type-btn.active {
+      border-color: #203a43;
+      background: #203a43;
+      color: white;
+    }
+    .signup-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .signup-link a {
+      color: #203a43;
+      text-decoration: none;
+    }
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+    .forgot-password {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .forgot-password a {
+      color: #666;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Wi-Fi Hotspot Monitoring</h2>
+    <p>Select Login Type</p>
+
+    <div class="user-type">
+      <label>Choose your login type:</label>
+      <div class="user-type-buttons">
+        <button class="user-type-btn active" onclick="selectUserType('user')">User Login</button>
+        <button class="user-type-btn" onclick="selectUserType('admin')">Admin Login</button>
+      </div>
+    </div>
+
+    <form onsubmit="return loginUser()">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p class="error" id="errorMsg"></p>
+
+    <div class="forgot-password">
+      <a href="#" onclick="forgotPassword()">Forgot Password?</a>
+    </div>
+
+    <div class="signup-link">
+      <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+      <p><a href="admin-registration.html">Government Admin Registration</a></p>
+    </div>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>

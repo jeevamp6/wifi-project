@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Wi-Fi Hotspot Monitoring</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Login Protection -->
+<script>
+  if (localStorage.getItem("login") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+
+<!-- Header -->
+<div class="header">
+  <h2>Wi-Fi Hotspot Monitoring Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- Cards Section -->
+<div class="cards">
+  <div class="card">
+    <h3>Total Hotspots</h3>
+    <p id="total">0</p>
+  </div>
+
+  <div class="card">
+    <h3>Active Hotspots</h3>
+    <p id="active">0</p>
+  </div>
+
+  <div class="card">
+    <h3>Avg Utilization</h3>
+    <p id="utilization">0%</p>
+  </div>
+
+  <div class="card alert">
+    <h3>Critical Districts</h3>
+    <p id="critical">0</p>
+  </div>
+</div>
+
+<!-- Message -->
+<div class="message">
+  <p>⚠ Many districts are below the required Wi-Fi penetration target.</p>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

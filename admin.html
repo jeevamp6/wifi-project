@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel | Wi-Fi Hotspot Monitoring</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-header {
+      background: #1a237e;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-nav {
+      background: #283593;
+      padding: 10px 20px;
+      display: flex;
+      gap: 20px;
+    }
+    .admin-nav button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+    .admin-nav button:hover, .admin-nav button.active {
+      background: #3949ab;
+    }
+    .admin-content {
+      padding: 20px;
+    }
+    .admin-section {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .admin-section.active {
+      display: block;
+    }
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .user-table th, .user-table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    .user-table th {
+      background: #f5f5f5;
+      font-weight: bold;
+    }
+    .user-table tr:hover {
+      background: #f9f9f9;
+    }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-active {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status-inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .role-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .role-admin {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .role-user {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    .role-viewer {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+    }
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-edit {
+      background: #007bff;
+      color: white;
+    }
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+    .btn-toggle {
+      background: #28a745;
+      color: white;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .stat-card h3 {
+      margin: 0 0 10px 0;
+      color: #666;
+      font-size: 14px;
+    }
+    .stat-card .number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #203a43;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Protection -->
+<script>
+  if (localStorage.getItem("login") !== "true" || localStorage.getItem("userRole") !== "admin") {
+    window.location.href = "login.html";
+  }
+</script>
+
+<!-- Admin Header -->
+<div class="admin-header">
+  <div>
+    <h2>Admin Panel</h2>
+    <p>Welcome, <span id="adminName">Admin</span> | Wi-Fi Hotspot Monitoring System</p>
+  </div>
+  <button onclick="logout()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Logout</button>
+</div>
+
+<!-- Admin Navigation -->
+<div class="admin-nav">
+  <button class="active" onclick="showSection('dashboard', this)">Dashboard</button>
+  <button onclick="showSection('users', this)">User Management</button>
+  <button onclick="showSection('system', this)">System Settings</button>
+  <button onclick="showSection('pendingAdmins', this)">Pending Admins</button>
+  <button onclick="showSection('loginActivities', this)">Login Activities</button>
+  <button onclick="showSection('logs', this)">Activity Logs</button>
+</div>
+
+<!-- Admin Content -->
+<div class="admin-content">
+  
+  <!-- Dashboard Section -->
+  <div id="dashboard" class="admin-section active">
+    <h3>System Overview</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Users</h3>
+        <div class="number" id="totalUsers">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Active Users</h3>
+        <div class="number" id="activeUsers">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Admin Users</h3>
+        <div class="number" id="adminUsers">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Regular Users</h3>
+        <div class="number" id="regularUsers">0</div>
+      </div>
+    </div>
+    
+    <div class="cards">
+      <div class="card">
+        <h3>Total Hotspots</h3>
+        <p id="total">0</p>
+      </div>
+      <div class="card">
+        <h3>Active Hotspots</h3>
+        <p id="active">0</p>
+      </div>
+      <div class="card">
+        <h3>Avg Utilization</h3>
+        <p id="utilization">0%</p>
+      </div>
+      <div class="card alert">
+        <h3>Critical Districts</h3>
+        <p id="critical">0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Management Section -->
+  <div id="users" class="admin-section">
+    <h3>User Management</h3>
+    <button onclick="addNewUser()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 20px;">Add New User</button>
+    
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- Users will be populated here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- System Settings Section -->
+  <div id="system" class="admin-section">
+    <h3>System Settings</h3>
+    <div style="max-width: 600px;">
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data Update Interval (seconds)</label>
+        <input type="number" id="updateInterval" value="2" min="1" max="60" style="width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        <button onclick="updateInterval()" style="margin-left: 10px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Update</button>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Critical Threshold (%)</label>
+        <input type="number" id="criticalThreshold" value="80" min="1" max="100" style="width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        <button onclick="updateThreshold()" style="margin-left: 10px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Update</button>
+      </div>
+      
+      <div>
+        <button onclick="exportData()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Export User Data</button>
+        <button onclick="clearLogs()" style="margin-left: 10px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear Activity Logs</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Admin Registrations Section -->
+  <div id="pendingAdmins" class="admin-section">
+    <h3>Pending Admin Registrations</h3>
+    <div style="margin-bottom: 20px;">
+      <button onclick="refreshPendingAdmins()" style="padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Refresh</button>
+    </div>
+    
+    <div id="pendingAdminsContent" style="max-height: 500px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+      <!-- Pending admins will be populated here -->
+    </div>
+  </div>
+
+  <!-- Login Activities Section -->
+  <div id="loginActivities" class="admin-section">
+    <h3>Login Activities</h3>
+    <div style="margin-bottom: 20px;">
+      <button onclick="refreshLoginActivities()" style="padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Refresh</button>
+      <button onclick="clearLoginActivities()" style="margin-left: 10px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear Local Logs</button>
+    </div>
+    
+    <div id="loginActivitiesContent" style="max-height: 500px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+      <!-- Login activities will be populated here -->
+    </div>
+  </div>
+
+  <!-- Activity Logs Section -->
+  <div id="logs" class="admin-section">
+    <h3>Activity Logs</h3>
+    <div id="logsContent" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+      <!-- Logs will be populated here -->
+    </div>
+  </div>
+
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

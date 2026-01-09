@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Device Monitoring | Wi-Fi Hotspot Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .device-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    
+    .device-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card h3 {
+      margin: 0 0 10px 0;
+      color: #203a43;
+    }
+    
+    .stat-card .number {
+      font-size: 2em;
+      font-weight: bold;
+      color: #2c5f7c;
+    }
+    
+    .device-filters {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .filter-row {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .filter-row select, .filter-row input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .device-table {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .device-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .device-table th,
+    .device-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .device-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #203a43;
+    }
+    
+    .device-table tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 500;
+    }
+    
+    .status-active {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .device-type-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      background: #e9ecef;
+      color: #495057;
+    }
+    
+    .security-events {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    
+    .security-event {
+      padding: 15px;
+      border-left: 4px solid #ffc107;
+      margin-bottom: 10px;
+      background: #fff8e1;
+    }
+    
+    .security-event.high {
+      border-left-color: #dc3545;
+      background: #f8d7da;
+    }
+    
+    .security-event.medium {
+      border-left-color: #ffc107;
+      background: #fff8e1;
+    }
+    
+    .security-event.low {
+      border-left-color: #28a745;
+      background: #d4edda;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background: #203a43;
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 0.8em;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+      background-color: white;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 600px;
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover {
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <div class="device-container">
+    <div class="device-header">
+      <h1>Device Monitoring</h1>
+      <div>
+        <button class="btn btn-primary" onclick="refreshDevices()">Refresh</button>
+        <button class="btn btn-secondary" onclick="simulateDevice()">Simulate Device</button>
+      </div>
+    </div>
+
+    <div class="device-stats">
+      <div class="stat-card">
+        <h3>Total Devices</h3>
+        <div class="number" id="totalDevices">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Active Devices</h3>
+        <div class="number" id="activeDevices">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Security Events</h3>
+        <div class="number" id="securityEvents">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Data Usage Today</h3>
+        <div class="number" id="dataUsage">0 GB</div>
+      </div>
+    </div>
+
+    <div class="device-filters">
+      <div class="filter-row">
+        <label>District:</label>
+        <select id="districtFilter" onchange="filterDevices()">
+          <option value="">All Districts</option>
+        </select>
+        
+        <label>Status:</label>
+        <select id="statusFilter" onchange="filterDevices()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        
+        <label>Search:</label>
+        <input type="text" id="searchInput" placeholder="Search by device name or MAC" onkeyup="filterDevices()">
+        
+        <button class="btn btn-primary" onclick="filterDevices()">Apply Filters</button>
+        <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+      </div>
+    </div>
+
+    <div class="device-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Device Name</th>
+            <th>MAC Address</th>
+            <th>IP Address</th>
+            <th>Type</th>
+            <th>District</th>
+            <th>Status</th>
+            <th>Last Seen</th>
+            <th>Connections</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="deviceTableBody">
+          <!-- Devices will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" id="pagination">
+      <!-- Pagination will be populated here -->
+    </div>
+
+    <div class="security-events">
+      <h2>Recent Security Events</h2>
+      <div id="securityEventsList">
+        <!-- Security events will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Details Modal -->
+  <div id="deviceModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Device Details</h2>
+      <div id="deviceDetails">
+        <!-- Device details will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="devices.js"></script>
+</body>
+</html>

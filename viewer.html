@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Viewer Dashboard | Wi-Fi Hotspot Monitoring</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .viewer-header {
+      background: #607d8b;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .viewer-info {
+      text-align: center;
+      background: #eceff1;
+      padding: 15px;
+      border-bottom: 2px solid #cfd8dc;
+    }
+    .viewer-badge {
+      display: inline-block;
+      background: #ff9800;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .readonly-notice {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 4px;
+      padding: 15px;
+      margin: 20px;
+      text-align: center;
+    }
+    .readonly-notice h4 {
+      margin: 0 0 5px 0;
+      color: #856404;
+    }
+    .readonly-notice p {
+      margin: 0;
+      color: #856404;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Protection -->
+<script>
+  if (localStorage.getItem("login") !== "true") {
+    window.location.href = "login.html";
+  }
+  
+  // Check if user has viewer role
+  const userRole = localStorage.getItem("userRole");
+  if (userRole !== "viewer" && userRole !== "user") {
+    // If not viewer, redirect to appropriate page
+    if (userRole === "admin") {
+      window.location.href = "admin.html";
+    } else {
+      window.location.href = "home.html";
+    }
+  }
+</script>
+
+<!-- Viewer Header -->
+<div class="viewer-header">
+  <div>
+    <h2>Wi-Fi Hotspot Monitoring - View Only</h2>
+    <p>Welcome, <span id="viewerName">Viewer</span> <span class="viewer-badge">READ ONLY</span></p>
+  </div>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- Viewer Info -->
+<div class="viewer-info">
+  <p>You are viewing this dashboard in read-only mode. Real-time data updates are enabled.</p>
+</div>
+
+<!-- Read-only Notice -->
+<div class="readonly-notice">
+  <h4>📊 View Only Mode</h4>
+  <p>You have view-only access. All data is displayed in real-time but cannot be modified.</p>
+</div>
+
+<!-- Cards Section -->
+<div class="cards">
+  <div class="card">
+    <h3>Total Hotspots</h3>
+    <p id="total">0</p>
+  </div>
+
+  <div class="card">
+    <h3>Active Hotspots</h3>
+    <p id="active">0</p>
+  </div>
+
+  <div class="card">
+    <h3>Avg Utilization</h3>
+    <p id="utilization">0%</p>
+  </div>
+
+  <div class="card alert">
+    <h3>Critical Districts</h3>
+    <p id="critical">0</p>
+  </div>
+</div>
+
+<!-- Message -->
+<div class="message">
+  <p>⚠ Many districts are below the required Wi-Fi penetration target.</p>
+</div>
+
+<!-- Additional Viewer Information -->
+<div style="padding: 20px;">
+  <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h3>System Information</h3>
+    <p><strong>Last Updated:</strong> <span id="lastUpdated">Never</span></p>
+    <p><strong>Connection Status:</strong> <span id="connectionStatus">Connecting...</span></p>
+    <p><strong>Your Role:</strong> Viewer (Read Only)</p>
+    <p><strong>Data Refresh Rate:</strong> Every 2 seconds</p>
+  </div>
+</div>
+
+<script src="viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up | Wi-Fi Hotspot Dashboard</title>
+  <link rel="stylesheet" href="login.css">
+  <style>
+    .login-container {
+      max-width: 500px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: bold;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .password-requirements {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .gov-id-group {
+      position: relative;
+    }
+    .id-format-hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .validation-message {
+      font-size: 12px;
+      margin-top: 5px;
+      padding: 5px;
+      border-radius: 4px;
+      display: none;
+    }
+    .validation-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+    .validation-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+    .admin-notice {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #856404;
+    }
+    .gov-id-field {
+      display: none;
+    }
+    .gov-id-field.show {
+      display: block;
+    }
+    .dept-field {
+      display: none;
+    }
+    .dept-field.show {
+      display: block;
+    }
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .login-link a {
+      color: #203a43;
+      text-decoration: none;
+    }
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Create Account</h2>
+    <p>Wi-Fi Hotspot Monitoring System</p>
+
+    <form onsubmit="return signupUser()">
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" placeholder="Enter your full name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Choose a username" required />
+      </div>
+
+      <div class="form-group">
+        <label for="role">User Role</label>
+        <select id="role" required onchange="toggleGovIdField()">
+          <option value="">Select your role</option>
+          <option value="user">Regular User</option>
+          <option value="admin">Administrator</option>
+          <option value="viewer">Viewer Only</option>
+        </select>
+      </div>
+
+      <div class="form-group gov-id-field" id="govIdField">
+        <label for="govId">Government ID Number *</label>
+        <div class="gov-id-group">
+          <input type="text" id="govId" placeholder="Enter 12-digit alphanumeric ID" 
+                 maxlength="12" pattern="[A-Za-z0-9]{12}"
+                 oninput="validateGovId(this)">
+          <div class="id-format-hint">Format: 12 characters (letters and numbers only)</div>
+          <div id="govIdValidation" class="validation-message"></div>
+        </div>
+      </div>
+
+      <div class="form-group gov-id-field" id="deptField">
+        <label for="department">Department *</label>
+        <select id="department">
+          <option value="">Select Department</option>
+          <option value="IT">Information Technology</option>
+          <option value="Security">Security Department</option>
+          <option value="Network">Network Operations</option>
+          <option value="Admin">General Administration</option>
+          <option value="Infrastructure">Infrastructure</option>
+          <option value="Compliance">Compliance & Audit</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Create a password" required />
+        <div class="password-requirements">
+          Password must be at least 8 characters long
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm your password" required />
+      </div>
+
+      <button type="submit" id="submitBtn" disabled>Sign Up</button>
+    </form>
+
+    <p class="error" id="errorMsg"></p>
+    <p class="success" id="successMsg"></p>
+
+    <div class="login-link">
+      <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+  </div>
+
+  <script src="signup.js"></script>
+</body>
+</html>

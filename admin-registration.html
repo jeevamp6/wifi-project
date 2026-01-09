@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Registration | Wi-Fi Hotspot Monitoring</title>
+  <link rel="stylesheet" href="login.css">
+  <style>
+    .admin-registration-container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .form-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .form-header h2 {
+      color: #1a237e;
+      margin-bottom: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: bold;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #1a237e;
+    }
+    
+    .gov-id-group {
+      position: relative;
+    }
+    
+    .id-format-hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .validation-message {
+      font-size: 12px;
+      margin-top: 5px;
+      padding: 5px;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .validation-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+    
+    .validation-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .submit-btn:hover {
+      background: #283593;
+    }
+    
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .security-notice {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #856404;
+    }
+    
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .back-link a {
+      color: #1a237e;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .password-strength {
+      margin-top: 5px;
+      font-size: 12px;
+    }
+    
+    .strength-weak {
+      color: #dc3545;
+    }
+    
+    .strength-medium {
+      color: #ffc107;
+    }
+    
+    .strength-strong {
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-registration-container">
+    <div class="form-header">
+      <h2>Admin Account Registration</h2>
+      <p>Government Authorized Personnel Only</p>
+    </div>
+
+    <div class="security-notice">
+      <strong>⚠️ Security Notice:</strong> This registration is for government-authorized administrators only. 
+      Valid government-issued ID is required for verification. Unauthorized registration attempts will be logged and may result in legal action.
+    </div>
+
+    <form id="adminRegistrationForm" onsubmit="return registerAdmin()">
+      <div class="form-group">
+        <label for="fullname">Full Name *</label>
+        <input type="text" id="fullname" name="fullname" required 
+               placeholder="Enter your full legal name">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Official Email *</label>
+        <input type="email" id="email" name="email" required 
+               placeholder="your.name@government.gov">
+      </div>
+
+      <div class="form-group">
+        <label for="username">Username *</label>
+        <input type="text" id="username" name="username" required 
+               placeholder="Choose a unique username" minlength="4">
+      </div>
+
+      <div class="form-group">
+        <label for="govId">Government ID Number *</label>
+        <div class="gov-id-group">
+          <input type="text" id="govId" name="govId" required 
+                 placeholder="Enter 12-digit alphanumeric ID" 
+                 maxlength="12" pattern="[A-Za-z0-9]{12}"
+                 oninput="validateGovId(this)">
+          <div class="id-format-hint">Format: 12 characters (letters and numbers only)</div>
+          <div id="govIdValidation" class="validation-message"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="department">Department *</label>
+        <select id="department" name="department" required>
+          <option value="">Select Department</option>
+          <option value="IT">Information Technology</option>
+          <option value="Security">Security Department</option>
+          <option value="Network">Network Operations</option>
+          <option value="Admin">General Administration</option>
+          <option value="Infrastructure">Infrastructure</option>
+          <option value="Compliance">Compliance & Audit</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password *</label>
+        <input type="password" id="password" name="password" required 
+               placeholder="Create strong password" minlength="8"
+               oninput="checkPasswordStrength(this)">
+        <div id="passwordStrength" class="password-strength"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password *</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required 
+               placeholder="Re-enter password" oninput="checkPasswordMatch()">
+        <div id="passwordMatch" class="validation-message"></div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>
+        Register Admin Account
+      </button>
+    </form>
+
+    <div class="back-link">
+      <p><a href="login.html">← Back to Login</a></p>
+    </div>
+  </div>
+
+  <script src="admin-registration.js"></script>
+</body>
+</html>
